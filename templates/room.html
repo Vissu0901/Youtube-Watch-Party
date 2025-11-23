@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="room-header">
+    <div>
+        <h2
+            style="margin: 0; font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, var(--primary-red), var(--primary-blue)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                style="vertical-align: middle; margin-right: 8px;">
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ff4b4b;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#4b7bff;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path
+                    d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+                </path>
+                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+            </svg>
+            Youtube-Watch Sync
+        </h2>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <span class="status-badge status-badge-connected" id="connectionStatus">
+                <span class="status-dot"></span>
+                Connecting...
+            </span>
+            <span class="status-badge viewer-badge" id="viewerCount" onclick="showViewers()"
+                title="Click to see viewers">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="vertical-align: middle;">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span id="viewerCountNumber">0</span> Viewers
+            </span>
+        </div>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <div class="room-id-container">
+            <span class="room-id-label">Room ID:</span>
+            <span id="currentRoomId" class="room-id-value">{{ room_id }}</span>
+            <button onclick="copyRoomId()" class="copy-btn" title="Copy Room ID">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+            </button>
+        </div>
+        <button onclick="leaveRoom()" class="btn btn-red" style="padding: 8px 16px; font-size: 0.9rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                style="vertical-align: middle; margin-right: 4px;">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Leave Room
+        </button>
+    </div>
+</div>
+
+<div class="glass-card">
+    <div class="controls-area" id="hostControls" style="margin-bottom: 1rem; display: none;">
+        <input type="text" id="videoUrlInput"
+            placeholder="Paste YouTube URL here (e.g., https://www.youtube.com/watch?v=...)"
+            style="margin-bottom: 0; flex-grow: 1;">
+        <button onclick="loadVideo()" class="btn btn-red" style="white-space: nowrap;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                style="vertical-align: middle; margin-right: 6px;">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Load Video
+        </button>
+    </div>
+
+    <!-- Two Column Layout: Notifications Left (Host Only), Video Right -->
+    <div style="display: flex; gap: 1rem;">
+        <!-- Left Column: Join Requests (Host Only) - Hidden for viewers -->
+        <div id="leftColumn" style="flex: 0 0 300px; display: none;">
+            <div id="joinRequestPanel"
+                style="display: none; padding: 1rem; background: rgba(75, 123, 255, 0.2); border: 1px solid rgba(75, 123, 255, 0.4); border-radius: 8px;">
+                <h3 style="margin: 0 0 0.5rem 0; color: var(--primary-blue);">Join Requests</h3>
+                <div id="joinRequestList"></div>
+            </div>
+        </div>
+
+        <!-- Right Column: Video Player -->
+        <div id="videoColumn" style="flex: 1;">
+            <div class="video-container" id="videoPlayer">
+                <div id="player"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Waiting for Approval Screen (Viewer Only) -->
+<div id="waitingScreen"
+    style="display: none; text-align: center; padding: 2rem 1rem; background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px;">
+    <div style="font-size: 3rem; margin-bottom: 1rem;"><span class="wait-icon-rotate">⏳</span></div>
+    <h3>Waiting for Host Approval...</h3>
+    <p style="opacity: 0.8; font-size: 0.9rem;">The host will review your request shortly.</p>
+</div>
+
+<!-- Viewers Modal -->
+<div id="viewersModal" style="display: none;">
+    <div id="viewersModalContent">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="margin: 0; color: var(--primary-blue);">Connected Viewers</h3>
+            <button onclick="closeViewersModal()"
+                style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        <div id="viewersList"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const ROOM_ID = "{{ room_id }}";
+</script>
+<script src="{{ url_for('static', filename='js/room.js') }}?v=13"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+{% endblock %}

@@ -1,0 +1,18 @@
+@socketio.on('disconnect')
+def on_disconnect():
+    # Remove user from all rooms
+    for room in list(room_users.keys()):
+        if request.sid in room_users[room]:
+            room_users[room].remove(request.sid)
+            print(f"User {request.sid} left room: {room}")
+            
+            # Broadcast updated viewer count
+            viewer_count = len(room_users[room])
+            emit('viewer_count', {'count': viewer_count}, room=room)
+            
+            # Clean up empty rooms
+            if len(room_users[room]) == 0:
+                del room_users[room]
+                if room in rooms:
+                    del rooms[room]
+                print(f"Room {room} deleted (empty)")

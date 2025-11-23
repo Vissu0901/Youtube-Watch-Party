@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h1>Youtube-Watch Sync</h1>
+    <p style="font-size: 1.2rem; opacity: 0.8;">Watch YouTube videos together in perfect sync.</p>
+
+    <div class="action-cards">
+        <div class="glass-card card">
+            <h2>Create a Room</h2>
+            <p>Start a new watch party and invite your friends.</p>
+            <div style="margin-top: 1rem;">
+                <input type="text" id="createNameInput" placeholder="Enter your name" style="margin-bottom: 0.5rem;">
+                <button onclick="createRoom()" class="btn btn-red" style="width: 100%;">Create New Room</button>
+            </div>
+        </div>
+
+        <div class="glass-card card">
+            <h2>Join a Room</h2>
+            <p>Enter your name and room ID to join an existing party.</p>
+            <div style="margin-top: 1rem;">
+                <input type="text" id="joinNameInput" placeholder="Enter your name" style="margin-bottom: 0.5rem;">
+                <input type="text" id="roomIdInput" placeholder="Enter Room ID" style="margin-bottom: 0.5rem;">
+                <button onclick="joinRoom()" class="btn btn-blue" style="width: 100%;">Join Room</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function validateName(name) {
+        name = name.trim();
+        if (name.length < 2 || name.length > 30) {
+            return 'Name must be between 2 and 30 characters';
+        }
+        if (!/^[A-Za-z0-9 ]+$/.test(name)) {
+            return 'Name can only contain letters, numbers, and spaces';
+        }
+        return null;
+    }
+
+    function createRoom() {
+        const name = document.getElementById('createNameInput').value.trim();
+        const error = validateName(name);
+
+        if (error) {
+            alert(error);
+            return;
+        }
+
+        const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+        sessionStorage.setItem('userName', name);
+        window.location.href = `/room/${roomId}`;
+    }
+
+    function joinRoom() {
+        const name = document.getElementById('joinNameInput').value.trim();
+        const roomId = document.getElementById('roomIdInput').value.trim().toUpperCase();
+
+        const nameError = validateName(name);
+        if (nameError) {
+            alert(nameError);
+            return;
+        }
+
+        if (!roomId || roomId.length !== 6) {
+            alert('Please enter a valid 6-character Room ID');
+            return;
+        }
+
+        sessionStorage.setItem('userName', name);
+        window.location.href = `/room/${roomId}`;
+    }
+</script>
+{% endblock %}

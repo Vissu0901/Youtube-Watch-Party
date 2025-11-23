@@ -1,0 +1,7 @@
+.viewer-badge {
+    background: rgba(75, 123, 255, 0.2);
+    color: var(--primary-blue);
+    border: 1px solid rgba(75, 123, 255, 0.3);
+    display: inline-flex;
+    align-items: center;
+}
