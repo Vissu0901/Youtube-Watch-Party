@@ -40,7 +40,7 @@
             </span>
         </div>
     </div>
-    <div style="display: flex; gap: 10px; align-items: center;">
+    <div class="room-header-right">
         <div class="room-id-container">
             <span class="room-id-label">Room ID:</span>
             <span id="currentRoomId" class="room-id-value">{{ room_id }}</span>
@@ -52,7 +52,7 @@
                 </svg>
             </button>
         </div>
-        <button onclick="leaveRoom()" class="btn btn-red" style="padding: 8px 16px; font-size: 0.9rem;">
+        <button onclick="leaveRoom()" class="btn btn-red">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 style="vertical-align: middle; margin-right: 4px;">
@@ -81,7 +81,7 @@
     </div>
 
     <!-- Two Column Layout: Notifications Left (Host Only), Video Right -->
-    <div style="display: flex; gap: 1rem;">
+    <div class="room-content-wrapper" style="display: flex; gap: 1rem;">
         <!-- Left Column: Join Requests (Host Only) - Hidden for viewers -->
         <div id="leftColumn" style="flex: 0 0 300px; display: none;">
             <div id="joinRequestPanel"
