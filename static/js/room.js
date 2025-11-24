@@ -20,12 +20,21 @@ socket.on('connect', function () {
     socket.emit('join', { room: ROOM_ID, name: userName, userId: userId });
 });
 
-socket.on('disconnect', function () {
+socket.on('disconnect', function (reason) {
     const status = document.getElementById('connectionStatus');
     status.innerText = 'Disconnected';
     status.style.color = '#ff4b4b';
     status.style.borderColor = 'rgba(255, 75, 75, 0.3)';
     status.style.background = 'rgba(255, 75, 75, 0.2)';
+    console.log('Socket disconnected:', reason);
+});
+
+socket.on('connect_error', function (error) {
+    const status = document.getElementById('connectionStatus');
+    status.innerText = 'Conn Error';
+    status.title = error;
+    status.style.color = '#ff4b4b';
+    console.log('Connection error:', error);
 });
 
 // YouTube Iframe API

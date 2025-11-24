@@ -1,7 +1,3 @@
-# Monkey patch for eventlet
-import eventlet
-eventlet.monkey_patch()
-
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import os
@@ -9,10 +5,16 @@ import db
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Use threading mode for better compatibility with serverless/Vercel
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Initialize Database
-db.init_db()
+# In Vercel, this might fail if not writable, or be ephemeral.
+# We'll try-except it to avoid crashing the app on start if DB is locked or readonly.
+try:
+    db.init_db()
+except Exception as e:
+    print(f"Database initialization warning: {e}")
 
 # Store users in each room: {room_id: set(session_ids)}
 # This tracks ACTIVE connections, which is transient.
